@@ -1,0 +1,46 @@
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Object Measurement</title>
+</head>
+<body>
+    <h1>Object Measurement</h1>
+    <img src="{{ url_for('video_feed') }}" width="640" height="480">
+</body>
+</html> -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Object Measurement</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+<body>
+    <h1>Object Measurement</h1>
+    <button id="start_measurement">Start Measurement</button>
+    <br><br>
+    <img id="video_feed" src="" width="640" height="480">
+
+    <script>
+        $(document).ready(function() {
+            var measurement_started = false;
+
+            $('#start_measurement').click(function() {
+                if (!measurement_started) {
+                    $('#video_feed').attr('src', '/video_feed');
+                    measurement_started = true;
+                    $(this).text('Stop Measurement');
+                } else {
+                    $('#video_feed').attr('src', '');
+                    measurement_started = false;
+                    $(this).text('Start Measurement');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

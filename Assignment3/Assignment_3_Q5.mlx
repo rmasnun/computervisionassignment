@@ -1,0 +1,53 @@
+% Load the images
+image1 = imread('problem1_frame1.jpg');
+image2 = imread('problem1_frame2.jpg');
+
+% Convert images to grayscale
+grayImage1 = rgb2gray(image1);
+grayImage2 = rgb2gray(image2);
+
+% Detect and extract features from both images
+points1 = detectSURFFeatures(grayImage1);
+points2 = detectSURFFeatures(grayImage2);
+
+[features1, points1] = extractFeatures(grayImage1, points1);
+[features2, points2] = extractFeatures(grayImage2, points2);
+
+% Match features
+indexPairs = matchFeatures(features1, features2);
+
+% Retrieve the locations of the corresponding points for each image
+matchedPoints1 = points1(indexPairs(:, 1), :);
+matchedPoints2 = points2(indexPairs(:, 2), :);
+
+% Estimate the geometric transformation using RANSAC
+[tform, inlierIdx] = estimateGeometricTransform2D(matchedPoints1, matchedPoints2, 'affine');
+
+% Filter out the outliers
+inlierPoints1 = matchedPoints1(inlierIdx, :);
+inlierPoints2 = matchedPoints2(inlierIdx, :);
+
+% Find the bounding box
+bboxPolygon = [1, 1;...                           % top-left
+        size(grayImage1, 2), 1;...                 % top-right
+        size(grayImage1, 2), size(grayImage1, 1);... % bottom-right
+        1, size(grayImage1, 1);...                 % bottom-left
+        1, 1];                   % top-left again to close the polygon
+
+newBoxPolygon = transformPointsForward(tform, bboxPolygon);
+
+% Display the matched features with the bounding box
+figure;
+imshow(image1);
+hold on;
+line(newBoxPolygon(:, 1), newBoxPolygon(:, 2), 'Color', 'r');
+title('Detected Box on Frame 1 with matched features');
+hold off;
+
+% Display the matched features with the bounding box
+figure;
+imshow(image2);
+hold on;
+line(newBoxPolygon(:, 1), newBoxPolygon(:, 2), 'Color', 'r');
+title('Detected Box on Frame 2 with matched features');
+hold off;

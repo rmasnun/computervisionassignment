@@ -1,0 +1,52 @@
+% Read the video file
+videoFile = 'problem1_video.mp4';
+videoReader = VideoReader(videoFile);
+
+% Create an optical flow object
+opticFlow = opticalFlowLK('NoiseThreshold',0.009);
+
+% Option 1: Treating every previous frame as a reference frame
+while hasFrame(videoReader)
+    frameRGB = readFrame(videoReader);
+    frameGray = rgb2gray(frameRGB);
+    flow = estimateFlow(opticFlow,frameGray);
+    imshow(frameRGB)
+    hold on
+    plot(flow, 'DecimationFactor', [5 5], 'ScaleFactor', 2)
+    hold off
+    drawnow
+end
+
+% Option 2: Treating every 11th frame as a reference frame
+videoReader.CurrentTime = 0; % Reset video to the beginning
+frame_counter = 0;
+while hasFrame(videoReader)
+    frameRGB = readFrame(videoReader);
+    frame_counter = frame_counter + 1;
+    if mod(frame_counter, 11) == 0
+        frameGray = rgb2gray(frameRGB);
+        flow = estimateFlow(opticFlow,frameGray);
+        imshow(frameRGB)
+        hold on
+        plot(flow, 'DecimationFactor', [5 5], 'ScaleFactor', 2)
+        hold off
+        drawnow
+    end
+end
+
+% Option 3: Treating every 31st frame as a reference frame
+videoReader.CurrentTime = 0; % Reset video to the beginning
+frame_counter = 0;
+while hasFrame(videoReader)
+    frameRGB = readFrame(videoReader);
+    frame_counter = frame_counter + 1;
+    if mod(frame_counter, 31) == 0
+        frameGray = rgb2gray(frameRGB);
+        flow = estimateFlow(opticFlow,frameGray);
+        imshow(frameRGB)
+        hold on
+        plot(flow, 'DecimationFactor', [5 5], 'ScaleFactor', 2)
+        hold off
+        drawnow
+    end
+end
