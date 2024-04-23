@@ -7,45 +7,21 @@ cap = cv2.VideoCapture('v.mp4')  # Replace 'video_footage.mp4' with the path to 
 # Select a frame from the video
 frame_number = 1000  # Change this to the desired frame number
 # cap.set(cv2.CAP_PROP_POS_FRAMES, frame_number)
-ret, frame = cap.read()
+ret, img = cap.read()
 
-# Convert the frame to grayscale
-gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+# Convert the image to grayscale
+gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
-# Compute gradients using Sobel operators
-grad_x = cv2.Sobel(gray, cv2.CV_64F, 1, 0, ksize=3)
-grad_y = cv2.Sobel(gray, cv2.CV_64F, 0, 1, ksize=3)
+# Perform corner detection using Harris Corner Detection
+dst = cv2.cornerHarris(gray, 2, 3, 0.04)
 
-# Compute elements of the structure tensor
-grad_xx = grad_x ** 2
-grad_xy = grad_x * grad_y
-grad_yy = grad_y ** 2
+# Dilate the corner points to make them clearer
+dst = cv2.dilate(dst, None)
 
-# Apply Gaussian blur to the structure tensor elements
-ksize = 3  # Kernel size for Gaussian blur
-sigma = 1.0  # Standard deviation for Gaussian blur
-grad_xx_blurred = cv2.GaussianBlur(grad_xx, (ksize, ksize), sigma)
-grad_xy_blurred = cv2.GaussianBlur(grad_xy, (ksize, ksize), sigma)
-grad_yy_blurred = cv2.GaussianBlur(grad_yy, (ksize, ksize), sigma)
+# Threshold for an optimal value, it may vary depending on the image.
+img[dst > 0.01 * dst.max()] = [0, 0, 255]
 
-# Compute the Harris response function
-k = 0.04  # Harris parameter
-harris_response = (grad_xx_blurred * grad_yy_blurred - grad_xy_blurred ** 2) - k * (grad_xx_blurred + grad_yy_blurred) ** 2
-
-# Apply thresholding to identify corner candidates
-threshold = 0.01 * np.max(harris_response)
-corner_candidates = np.zeros_like(gray)
-corner_candidates[harris_response > threshold] = 255
-
-# Perform non-maximum suppression to select the strongest corners
-corners = cv2.cornerMinEigenVal(gray, blockSize=3, ksize=3)
-corners = cv2.dilate(corners, None)
-
-# Display the original frame and detected corners
-cv2.imshow('Original Frame', frame)
-cv2.imshow('Detected Corners', corners)
+# Display the result
+cv2.imshow('Corners Detected', img)
 cv2.waitKey(0)
-
-# Release video capture and close OpenCV windows
-cap.release()
 cv2.destroyAllWindows()

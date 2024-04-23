@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panoramic Video</title>
+    <script>
+        function toggleStream() {
+            var btn = document.getElementById("toggleButton");
+            if (btn.innerHTML === "Start Panoramic Video") {
+                btn.innerHTML = "Stop Panoramic Video";
+                document.getElementById('stream').src = "{{ url_for('video_feed') }}";
+            } else {
+                btn.innerHTML = "Start Panoramic Video";
+                document.getElementById('stream').src = "";
+            }
+        }
+
+        // function toggleIntegral() {
+        //     var playing = false;
+
+        //     $('#toggle_feed').on('click', function(){
+        //         console.log('hello');
+        //         if (playing){
+        //             $(this).text('Start Feed');
+        //             playing = false;
+        //             $("#video_feed").attr('src', '');
+        //             console.log('Start Feed');
+        //         } else {
+        //             $(this).text('Stop Feed');
+        //             playing = true;
+        //             console.log('Stop Feed');
+        //             $("#video_feed").attr('src', "{{ url_for('integral_feed') }}");
+        //         }
+        //     });
+        // }
+        
+    </script>
+</head>
+<body>
+    <h1>Panoramic Video</h1>
+    <button id="toggleButton" onclick="toggleStream()">Start Panoramic Video</button>
+    <br>
+    <img id="stream" style="width:100%;">
+    <h1>Integral Image</h1>
+    <button id="toggle_feed" >Start Feed</button>
+    <img id="video_feed">
+    <script>
+        var playing = false;
+
+        document.getElementById("toggle_feed").addEventListener("click", function(){
+            if (playing){
+                document.getElementById("toggle_feed").textContent = "Start Feed";
+                playing = false;
+                document.getElementById("video_feed").src = '';
+            } else {
+                document.getElementById("toggle_feed").textContent = "Stop Feed";
+                playing = true;
+                document.getElementById("video_feed").src = "{{ url_for('integral_feed') }}";
+            }
+        });
+    </script>
+</body>
+</html>
